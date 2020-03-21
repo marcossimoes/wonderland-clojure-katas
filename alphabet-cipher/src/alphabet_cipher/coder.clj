@@ -1,4 +1,5 @@
-(ns alphabet-cipher.coder)
+(ns alphabet-cipher.coder
+  (:require [clojure.string :as str]))
 
 (defn char->index
   "receives a capital letter in char format and returns an index from 0 (A) to 25 (Z)"
@@ -46,10 +47,20 @@
   (let [extnd-kwd (extended-kwd keyword message)]
     (apply str (map decode-char extnd-kwd message))))
 
-(defn decipher
-  ([cipher message] (decipher cipher message 1))
-  ([cipher message num-parts]
-   (let [parts (partition num-parts (decode message cipher))]
-     (if #nu/tap (apply = parts)
-       #nu/tap (apply str (first parts))
-       (decipher cipher message (inc num-parts))))))
+(defn all-rem-parts-eql? [rem] (apply = rem))
+
+(defn sub-list-of? [l1 l2] (= (take (count l1) l2) l1))
+
+(defn decompose-in-eql-parts-of-size [ext-kwd size]
+  (let [[last & rem] (reverse (partition size size nil ext-kwd))]
+    (when (and (all-rem-parts-eql? rem)
+               (sub-list-of? last (first rem)))
+      (apply str (first rem)))))
+
+(defn decompose-in-eql-parts-of [ext-kwd]
+  (some (partial decompose-in-eql-parts-of-size ext-kwd) (range 1 (count ext-kwd))))
+
+(defn decipher [cipher message]
+  (let [ext-kwd (decode message cipher)]
+    (decompose-in-eql-parts-of ext-kwd)))
+
