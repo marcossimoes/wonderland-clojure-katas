@@ -7,7 +7,6 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
-/.idea/*
-/.githooks/*
-/*.iml
-/.idea/
+.githooks
+*.iml
+.idea
